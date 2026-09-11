@@ -60,8 +60,8 @@ class MainActivity : FlutterActivity() {
         }
         when (key) {
             "isDebuggable" -> {
-                val flags = packageManagergetApplicationInfo(packageName, 0).flags
-                result.success((flags and PackageManager.FLAG_DEBUGGABLE) != 0)
+                val flags = packageManager.getApplicationInfo(packageName, 0).flags
+                result.success(flags and PackageManager.FLAG_DEBUGGABLE != 0)
             }
             "packageName" -> result.success(packageName)
             else -> result.error("UNKNOWN_KEY", "no data for key '$key'", null)
@@ -162,7 +162,7 @@ class MainActivity : FlutterActivity() {
                     (id, type, created_at, customer_id, reference, note,
                      payment_status, payment_method, paid_minor, currency_code)
                 VALUES (?, 'sale', ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')
-            """, listOf(txId, nowMs, status, paymentMethod, paidMinor))
+            """, listOf(txId, nowMs, status, paymentMethod, paidMinor) as List<Any>)
             _sqlExec(dbPath, """
                 INSERT INTO transaction_lines
                     (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor)
