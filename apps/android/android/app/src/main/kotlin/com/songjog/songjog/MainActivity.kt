@@ -61,7 +61,7 @@ class MainActivity : FlutterActivity() {
         when (key) {
             "isDebuggable" -> {
                 val flags = packageManager.getApplicationInfo(packageName, 0).flags
-                result.success(flags and PackageManager.FLAG_DEBUGGABLE != 0)
+                result.success((flags and 0x00000002) != 0)
             }
             "packageName" -> result.success(packageName)
             else -> result.error("UNKNOWN_KEY", "no data for key '$key'", null)
