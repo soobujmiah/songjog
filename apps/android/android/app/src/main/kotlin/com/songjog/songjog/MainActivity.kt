@@ -29,10 +29,10 @@ class MainActivity : FlutterActivity() {
         val action = intent?.getStringExtra(EXTRA_ACTION)
         if (!action.isNullOrEmpty()) {
             _recordAction(action)
-            // Seed the database natively so ADB-driven validation works
-            // without requiring the Flutter MethodChannel to be ready.
             if (action == "seed_profile") {
                 _nativeSeedProfile(intent)
+            } else if (action == "seed_sale") {
+                _nativeSeedSale(intent)
             }
         }
         super.onCreate(savedInstanceState)
@@ -312,6 +312,45 @@ class MainActivity : FlutterActivity() {
             _recordAction("seed_profile_native")
         } catch (e: Exception) {
             _recordAction("seed_profile_native_fail: ${e.message}")
+        }
+    }
+
+    private fun _nativeSeedSale(intent: android.content.Intent?) {
+        try {
+            val description = intent?.getStringExtra("description") ?: "Test Item"
+            val quantityStr = intent?.getStringExtra("quantity")
+            val priceMinorStr = intent?.getStringExtra("priceMinor")
+            val paidMinorStr = intent?.getStringExtra("paidMinor")
+            val paymentMethod = intent?.getStringExtra("paymentMethod")
+            val quantity = quantityStr?.toDoubleOrNull() ?: 1.0
+            val priceMinor = priceMinorStr?.toIntOrNull() ?: 50000
+            val paidMinor = paidMinorStr?.toIntOrNull() ?: priceMinor
+            val nowMs = System.currentTimeMillis()
+            val txId = "adb-sold-${nowMs}"
+            val lineId = "$txId-l0"
+            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val status = when {
+                priceMinor <= 0 -> "unpaid"
+                paidMinor >= priceMinor -> "paid"
+                paidMinor > 0 -> "partial"
+                else -> "unpaid"
+            }
+            val db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
+            db.execSQL("""
+                INSERT INTO transactions
+                    (id, type, created_at, customer_id, reference, note,
+                     payment_status, payment_method, paid_minor, currency_code)
+                VALUES (?, 'sale', ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')
+            """, arrayOf(txId, nowMs, status, paymentMethod, paidMinor))
+            db.execSQL("""
+                INSERT INTO transaction_lines
+                    (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor)
+                VALUES (?, ?, ?, ?, ?, NULL)
+            """, arrayOf(lineId, txId, description, quantity, priceMinor))
+            db.close()
+            _recordAction("seed_sale_native")
+        } catch (e: Exception) {
+            _recordAction("seed_sale_native_fail: ${e.message}")
         }
     }
 }
