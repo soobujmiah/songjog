@@ -80,7 +80,7 @@ class MainActivity : FlutterActivity() {
     @Suppress("UNCHECKED_CAST")
     private fun _handleQueryState(result: MethodChannel.Result) {
         try {
-            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val dbPath = databasesDir.resolve("songjog.db").absolutePath
             val profiles = _sqlCount(dbPath, "SELECT COUNT(*) FROM business_profile")
             val transactions = _sqlCount(dbPath, "SELECT COUNT(*) FROM transactions")
             val lastTotal = _sqlLongOrNull(
@@ -102,7 +102,7 @@ class MainActivity : FlutterActivity() {
     // ----------------------------------------------------------------
     private fun _handleReset(result: MethodChannel.Result) {
         try {
-            val db = filesDir.resolve("songjog.db")
+            val db = databasesDir.resolve("songjog.db")
             val diag = filesDir.resolve("diagnostics.jsonl")
             val exports = filesDir.resolve("exports")
             db.deleteRecursively()
@@ -125,7 +125,7 @@ class MainActivity : FlutterActivity() {
                 ?: throw IllegalArgumentException("name is required")
             val bizType = (call.argument<String>("businessType"))
                 ?: "retail"
-            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val dbPath = databasesDir.resolve("songjog.db").absolutePath
             // Remove any existing profile first (idempotent).
             _sqlExec(dbPath, "DELETE FROM business_profile")
             val id = "adb-seeded-${System.currentTimeMillis()}"
@@ -155,7 +155,7 @@ class MainActivity : FlutterActivity() {
             val nowMs = System.currentTimeMillis()
             val txId = "adb-sold-${nowMs}"
             val lineId = "$txId-l0"
-            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val dbPath = databasesDir.resolve("songjog.db").absolutePath
             // Compute payment status deterministically.
             val status = when {
                 priceMinor <= 0 -> "unpaid"
@@ -258,7 +258,7 @@ class MainActivity : FlutterActivity() {
         try {
             val name = intent?.getStringExtra("business_name") ?: "ADB Test Shop"
             val bizType = intent?.getStringExtra("business_type") ?: "retail"
-            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val dbPath = databasesDir.resolve("songjog.db").absolutePath
             val db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
             db.execSQL("""
                 CREATE TABLE IF NOT EXISTS android_metadata (locale TEXT)
@@ -328,7 +328,7 @@ class MainActivity : FlutterActivity() {
             val nowMs = System.currentTimeMillis()
             val txId = "adb-sold-${nowMs}"
             val lineId = "$txId-l0"
-            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val dbPath = databasesDir.resolve("songjog.db").absolutePath
             val status = when {
                 priceMinor <= 0 -> "unpaid"
                 paidMinor >= priceMinor -> "paid"
