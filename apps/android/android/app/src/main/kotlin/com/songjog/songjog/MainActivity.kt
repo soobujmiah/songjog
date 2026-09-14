@@ -2,6 +2,7 @@ package com.songjog.songjog
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.database.sqlite.SQLiteDatabase
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
@@ -28,6 +29,11 @@ class MainActivity : FlutterActivity() {
         val action = intent?.getStringExtra(EXTRA_ACTION)
         if (!action.isNullOrEmpty()) {
             _recordAction(action)
+            // Seed the database natively so ADB-driven validation works
+            // without requiring the Flutter MethodChannel to be ready.
+            if (action == "seed_profile") {
+                _nativeSeedProfile(intent)
+            }
         }
         super.onCreate(savedInstanceState)
     }
@@ -242,5 +248,70 @@ class MainActivity : FlutterActivity() {
             val log = File(filesDir, "debug_actions.log")
             log.appendText("$ts $action\n")
         } catch (_: Exception) {}
+    }
+
+    // ----------------------------------------------------------------
+    // Native seed — creates DB schema + profile when intent fires,
+    // before Flutter's MethodChannel is reachable.
+    // ----------------------------------------------------------------
+    private fun _nativeSeedProfile(intent: android.content.Intent?) {
+        try {
+            val name = intent?.getStringExtra("business_name") ?: "ADB Test Shop"
+            val bizType = intent?.getStringExtra("business_type") ?: "retail"
+            val dbPath = filesDir.resolve("songjog.db").absolutePath
+            val db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS android_metadata (locale TEXT)
+            """)
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS business_profile (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    workspace_kind TEXT NOT NULL,
+                    business_type TEXT NOT NULL,
+                    subtype TEXT,
+                    phone TEXT,
+                    address TEXT
+                )
+            """)
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS transactions (
+                    id TEXT PRIMARY KEY,
+                    type TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    customer_id TEXT,
+                    reference TEXT,
+                    note TEXT,
+                    payment_status TEXT NOT NULL,
+                    payment_method TEXT,
+                    paid_minor INTEGER NOT NULL,
+                    currency_code TEXT NOT NULL DEFAULT 'BDT'
+                )
+            """)
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS transaction_lines (
+                    id TEXT PRIMARY KEY,
+                    transaction_id TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    quantity REAL NOT NULL,
+                    selling_price_minor INTEGER NOT NULL,
+                    actual_cost_minor INTEGER,
+                    FOREIGN KEY(transaction_id) REFERENCES transactions(id) ON DELETE CASCADE
+                )
+            """)
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_transaction_lines_transaction_id ON transaction_lines(transaction_id)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_transactions_customer_id ON transactions(customer_id)")
+            db.execSQL("DELETE FROM business_profile")
+            val id = "adb-seeded-${System.currentTimeMillis()}"
+            db.execSQL(
+                "INSERT INTO business_profile (id, name, workspace_kind, business_type, subtype, phone, address) VALUES (?, ?, ?, ?, NULL, NULL, NULL)",
+                arrayOf(id, name, "business", bizType)
+            )
+            db.close()
+            _recordAction("seed_profile_native")
+        } catch (e: Exception) {
+            _recordAction("seed_profile_native_fail: ${e.message}")
+        }
     }
 }
