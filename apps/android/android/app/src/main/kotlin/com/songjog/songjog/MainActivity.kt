@@ -336,17 +336,14 @@ class MainActivity : FlutterActivity() {
                 else -> "unpaid"
             }
             val db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
-            db.execSQL("""
-                INSERT INTO transactions
-                    (id, type, created_at, customer_id, reference, note,
-                     payment_status, payment_method, paid_minor, currency_code)
-                VALUES (?, 'sale', ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')
-            """, arrayOf(txId, nowMs, status, paymentMethod, paidMinor))
-            db.execSQL("""
-                INSERT INTO transaction_lines
-                    (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor)
-                VALUES (?, ?, ?, ?, ?, NULL)
-            """, arrayOf(lineId, txId, description, quantity, priceMinor))
+            db.execSQL(
+                "INSERT INTO transactions (id, type, created_at, customer_id, reference, note, payment_status, payment_method, paid_minor, currency_code) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')",
+                arrayOf(txId, "sale", nowMs.toString(), status, paymentMethod ?: "", paidMinor.toString())
+            )
+            db.execSQL(
+                "INSERT INTO transaction_lines (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor) VALUES (?, ?, ?, ?, ?, NULL)",
+                arrayOf(lineId, txId, description, quantity.toString(), priceMinor.toString())
+            )
             db.close()
             _recordAction("seed_sale_native")
         } catch (e: Exception) {
