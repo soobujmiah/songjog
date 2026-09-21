@@ -3,7 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// Deterministic test-control surface for ADB-first device validation.
+/// Deterministic test-control surface originally built for the ADB-first device-validation
+/// methodology.
+///
+/// NOTE (2026-09-21): this is an application-native deterministic control surface — a superseded
+/// tier-1 mechanism (`soobujmiah/skb` -> `DEC-2026-09-21-001`). It is retained as build-gated
+/// debug functionality, but it is NOT an authorized path for autonomous agent interaction with
+/// the application UI. Owner human interaction is the only operative input path.
 ///
 /// **Build-gated**: only [isAvailable] is true when `kDebugMode` AND
 /// `FLAG_DEBUGGABLE` is set on the Android package (both are true for
