@@ -1,4 +1,12 @@
 #!/bin/bash
+# ─────────────────────────────────────────────────────────────────────────────
+# SUPERSEDED — HISTORICAL ONLY. NOT AUTHORIZED FOR AUTONOMOUS SUPERVISOR USE.
+# This script drives the application by ADB input injection, part of the superseded
+# four-tier control model. See soobujmiah/skb ->
+# operations/decisions/2026-09-21--skb--human-operated-testing-model.md
+# (DEC-2026-09-21-001, 2026-09-21). Retained as historical tooling. The only
+# operative input path is owner human interaction.
+# ─────────────────────────────────────────────────────────────────────────────
 # Songjog ADB-focused validation - minimal script for device testing
 # Tests critical flows with proper focus management
 

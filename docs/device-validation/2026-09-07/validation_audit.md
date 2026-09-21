@@ -1,5 +1,13 @@
 # Songjog P0 Flow Validation Audit Record
 
+> **SUPERSEDED — HISTORICAL ONLY.** This record documents work performed under the four-tier
+> autonomous control hierarchy (ADB-first → application-native control → raw `adb shell input` →
+> UIAutomator), which is superseded in full. See `soobujmiah/skb` →
+> `operations/decisions/2026-09-21--skb--human-operated-testing-model.md` (`DEC-2026-09-21-001`,
+> 2026-09-21). The record is preserved verbatim as evidence of that work; it is not an
+> authorization, and it does not describe current practice. The only operative input path is
+> **owner human interaction**; the Supervisor observes, records scoped evidence, analyzes and fixes.
+
 **Validation Date:** 2026-09-07  
 **Tester:** Agnes (Hermes Agent)  
 **Device:** Redmi Turbo 4 Pro (`25053RT47C`, codename `onyx`, Android 16/SDK 36)  

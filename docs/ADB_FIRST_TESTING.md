@@ -1,34 +1,52 @@
-# ADB-first device testing
+# Device testing — human-operated interaction, agent observation (supersedes "ADB-first device testing")
 
-This repository is Android/Android-adjacent, so real-device testing follows the canonical
-control hierarchy defined in `soobujmiah/skb` → `standards/agent-device-testing.md`
-(the "Agent Device Testing Standard"):
+> **SUPERSEDED — HISTORICAL ONLY.** The section that used to sit here restated a four-tier
+> autonomous control hierarchy (ADB-first → application-native control → raw `adb shell input` →
+> UIAutomator) from `soobujmiah/skb` → `standards/agent-device-testing.md` and presented it as
+> current. **All four tiers are superseded.** See `soobujmiah/skb` →
+> `operations/decisions/2026-09-21--skb--human-operated-testing-model.md`
+> (`DEC-2026-09-21-001`, 2026-09-21). No agent may treat any of them as standing authorization,
+> and no differently-named mechanism may accomplish the same prohibited interaction.
 
-1. **ADB-first.** Work against the real, directly connected device through `adb`, not an
-   emulator or UI-driven simulation.
-2. **Application-native control.** Prefer whatever this app exposes — an exported
-   Activity/Intent, a service, a broadcast receiver, a debug/test interface — over raw input.
-3. **Raw `adb shell input`** for deterministic taps/text/keys when no better interface exists.
-4. **UIAutomator** only as a last resort, for interactions with genuinely no other control path.
+## Current model
 
-Performance principles (from the same standard): batch independent ADB commands, wait on an
-observable readiness condition (`pidof`, `am start -W`, a specific logcat pattern, a `dumpsys`
-state) instead of an arbitrary `sleep`, filter logs to this app's own tags, and prefer
-programmatic state checks over screenshots wherever the same fact is available without one.
+**The owner performs application interaction. The Supervisor observes, records scoped evidence,
+analyzes, diagnoses, and fixes.**
 
-**Reference implementation:** `soobujmiah/lai`'s `docs/TESTING.md` ("ADB-first device testing" /
-"Backend qualification") and `scripts/device/lai_adb.sh` are the worked example — a small,
-reusable ADB helper (install/reset/launch/wait-process/wait-log/logs/state/qualify) plus an
-app-native qualification path added directly to the app (intent extras on its existing exported
-launcher Activity, gated behind an existing build-time evidence flag) for the one interaction
-ADB and raw input alone couldn't reach deterministically. Reuse that shape rather than
-re-deriving it — implement only the subset this repository's own testing gaps actually need.
+The Supervisor may: launch the application (where the testing standard permits), observe, collect
+scoped logs, use `logcat`/`dumpsys`, run permitted diagnostics, verify package/activity/foreground
+identity, collect permitted evidence, take gated screenshots, analyze, diagnose, modify project
+code, fix, and send builds through GitHub CI.
+
+The Supervisor must **not** autonomously interact with the application UI by any mechanism —
+taps, swipes, button presses, key events, text injection, IME/test-IME, ADB keyboard bridges,
+UIAutomator, accessibility-driven actions, application-native deterministic controls (intent
+extras, debug/test Activities, broadcast or service control surfaces, debug channels),
+Intent-driven input, or any equivalent mechanism. The only operative input path is **owner human
+interaction** (touch, gestures, buttons, text entry, keyboard).
+
+## Observation and diagnostic practice (retained)
+
+Batch independent ADB commands, wait on an observable readiness condition (`pidof`,
+`am start -W`, a specific logcat pattern, a `dumpsys` state) instead of an arbitrary `sleep`,
+filter logs to this application's own tags, and prefer programmatic state checks over screenshots
+wherever the same fact is available without one. These are observation techniques and remain in
+force.
+
+## Reference tooling
+
+`soobujmiah/lai`'s `scripts/device/lai_adb.sh` remains a valid reference for the **observation**
+half of device work (install/reset/launch/wait-process/wait-log/logs/state checks). The
+app-native qualification path (intent extras on an exported launcher Activity) that
+`soobujmiah/lai`'s `docs/TESTING.md` once documented is **superseded** and is not an authorized
+agent input path.
 
 ## Relationship to `docs/PHYSICAL_DEVICE_VALIDATION.md`
 
-That document is this repository's existing device-validation checklist — evidence-based but
-manual/UI-navigation-style. It stays the source of truth for *what* to validate; this standard's
-control hierarchy should inform *how* each step is actually driven going forward (ADB/`adb shell
-am`/`dumpsys` before a manual tap, Flutter's own `integration_test`/`flutter drive` as the
-instrumentation tier before UIAutomator). `MainActivity` is a plain Flutter-embedding launcher
-with no custom intent extras today.
+That document remains this repository's device-validation checklist and stays the source of truth
+for *what* to validate. *How* each step is driven has changed: the **owner** performs the
+interaction on the device; the Supervisor launches, observes, collects scoped logs and evidence,
+analyzes, diagnoses and fixes. Flutter's own `integration_test`/`flutter drive` remain valid as
+CI/CI-side automation (§13) but are not an authorized path for autonomously driving the
+application on the owner's live device. `MainActivity` is a plain Flutter-embedding launcher with
+no custom intent extras today.

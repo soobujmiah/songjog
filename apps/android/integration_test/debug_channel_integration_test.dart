@@ -1,4 +1,8 @@
-// Integration test for DebugChannel — deterministic ADB-first device validation.
+// Integration test for DebugChannel — deterministic app-native test control surface.
+//
+// NOTE (2026-09-21): this is developer/CI tooling (flutter drive against a device or CI
+// harness). It is NOT an authorized path for autonomous agent interaction with the owner's
+// live device — that four-tier control model is superseded (soobujmiah/skb -> DEC-2026-09-21-001).
 //
 // Run via:
 //   flutter drive \

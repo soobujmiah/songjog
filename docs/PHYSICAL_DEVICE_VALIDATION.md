@@ -1,6 +1,8 @@
-> See `docs/ADB_FIRST_TESTING.md` for the control hierarchy this checklist should be driven
-> through: ADB/app-native control before a manual tap, wherever a step below can be done either
-> way.
+> See `docs/ADB_FIRST_TESTING.md` for the current device-testing model: the **owner performs the
+> application interaction**; the Supervisor launches, observes, collects scoped evidence, analyzes,
+> diagnoses and fixes. The four-tier autonomous control hierarchy previously referenced here is
+> superseded — see `soobujmiah/skb` → `DEC-2026-09-21-001` (2026-09-21). The evidence items in this
+> checklist are unchanged.
 
 # Physical Device Validation — Milestone & Checklist
 

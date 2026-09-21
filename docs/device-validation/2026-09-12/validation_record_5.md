@@ -1,5 +1,13 @@
 # Device Validation Record 5 — 2026-09-12
 
+> **SUPERSEDED — HISTORICAL ONLY.** This record documents work performed under the four-tier
+> autonomous control hierarchy (ADB-first → application-native control → raw `adb shell input` →
+> UIAutomator), which is superseded in full. See `soobujmiah/skb` →
+> `operations/decisions/2026-09-21--skb--human-operated-testing-model.md` (`DEC-2026-09-21-001`,
+> 2026-09-21). The record is preserved verbatim as evidence of that work; it is not an
+> authorization, and it does not describe current practice. The only operative input path is
+> **owner human interaction**; the Supervisor observes, records scoped evidence, analyzes and fixes.
+
 **HEAD:** `a490f28df3a9b4b8488f9a2332a01b0b50ada62a`
 **CI Run:** [#34612168071](https://github.com/soobujmiah/songjog/actions/runs/34612168071) — Analyze + unit/widget tests ✅ (58s), Legacy audit ✅ (6s), Build debug APK ✅ (4m38s)
 **Agent:** Hermes agent on Redmi Turbo 4 Pro (`25053RT47C`, Android 16, SDK 36, Bangla locale)
