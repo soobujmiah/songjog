@@ -85,12 +85,13 @@ class MainActivity : FlutterActivity() {
     @Suppress("UNCHECKED_CAST")
     private fun _handleQueryState(result: MethodChannel.Result) {
         try {
-            val dbPath = _dbPath()
-            val profiles = _sqlCount(dbPath, "SELECT COUNT(*) FROM business_profile")
-            val transactions = _sqlCount(dbPath, "SELECT COUNT(*) FROM transactions")
+            val profiles = _sqlCount("SELECT COUNT(*) FROM business_profile")
+            val transactions = _sqlCount("SELECT COUNT(*) FROM transactions")
             val lastTotal = _sqlLongOrNull(
-                dbPath,
-                "SELECT COALESCE(MAX(paid_minor + (total_minor - paid_minor)), 0) FROM transactions"
+                "SELECT COALESCE(MAX(selling_price_minor * quantity), 0) " +
+                "FROM transaction_lines WHERE transaction_id IN (" +
+                "  SELECT id FROM transactions ORDER BY created_at DESC LIMIT 1" +
+                ")"
             )
             result.success(mapOf(
                 "profileCount" to profiles,
@@ -130,15 +131,13 @@ class MainActivity : FlutterActivity() {
                 ?: throw IllegalArgumentException("name is required")
             val bizType = (call.argument<String>("businessType"))
                 ?: "retail"
-            val dbPath = _dbPath()
             // Remove any existing profile first (idempotent).
-            _sqlExec(dbPath, "DELETE FROM business_profile")
+            _sqlExec("DELETE FROM business_profile")
             val id = "adb-seeded-${System.currentTimeMillis()}"
-            _sqlExec(dbPath, """
-                INSERT INTO business_profile
-                    (id, name, workspace_kind, business_type, subtype, phone, address)
-                VALUES (?, ?, ?, ?, NULL, NULL, NULL)
-            """, listOf(id, name, "business", bizType))
+            _sqlExec(
+                "INSERT INTO business_profile (id, name, workspace_kind, business_type, subtype, phone, address) VALUES (?, ?, ?, ?, NULL, NULL, NULL)",
+                listOf(id, name, "business", bizType)
+            )
             _recordAction("seed_profile")
             result.success(mapOf("profileId" to id, "name" to name))
         } catch (e: Exception) {
@@ -160,7 +159,6 @@ class MainActivity : FlutterActivity() {
             val nowMs = System.currentTimeMillis()
             val txId = "adb-sold-${nowMs}"
             val lineId = "$txId-l0"
-            val dbPath = _dbPath()
             // Compute payment status deterministically.
             val status = when {
                 priceMinor <= 0 -> "unpaid"
@@ -168,17 +166,14 @@ class MainActivity : FlutterActivity() {
                 paidMinor > 0 -> "partial"
                 else -> "unpaid"
             }
-            _sqlExec(dbPath, """
-                INSERT INTO transactions
-                    (id, type, created_at, customer_id, reference, note,
-                     payment_status, payment_method, paid_minor, currency_code)
-                VALUES (?, 'sale', ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')
-            """, listOf(txId, nowMs, status, paymentMethod, paidMinor) as List<Any>)
-            _sqlExec(dbPath, """
-                INSERT INTO transaction_lines
-                    (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor)
-                VALUES (?, ?, ?, ?, ?, NULL)
-            """, listOf(lineId, txId, description, quantity, priceMinor))
+            _sqlExec(
+                "INSERT INTO transactions (id, type, created_at, customer_id, reference, note, payment_status, payment_method, paid_minor, currency_code) VALUES (?, 'sale', ?, NULL, NULL, NULL, ?, ?, ?, 'BDT')",
+                listOf(txId, nowMs.toString(), status, paymentMethod, paidMinor.toString())
+            )
+            _sqlExec(
+                "INSERT INTO transaction_lines (id, transaction_id, description, quantity, selling_price_minor, actual_cost_minor) VALUES (?, ?, ?, ?, ?, NULL)",
+                listOf(lineId, txId, description, quantity.toString(), priceMinor.toString())
+            )
             _recordAction("seed_sale")
             result.success(mapOf(
                 "transactionId" to txId,
@@ -192,56 +187,51 @@ class MainActivity : FlutterActivity() {
     }
 
     // ----------------------------------------------------------------
-    // SQLite helpers  — direct file access via run-as style subprocess
+    // SQLite helpers  — native Android SQLiteDatabase (device-safe)
     // ----------------------------------------------------------------
-    private fun _sqliteBin(): String {
-        // Prefer the bundled sqlite3 from the Android SDK toolchain, falling back
-        // to the system one if present.
-        val sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
-        if (sdkRoot != null) {
-            val candidate = File(sdkRoot, "platform-tools/sqlite3")
-            if (candidate.exists()) return candidate.absolutePath
-        }
-        return "/home/sbj/android-sdk/platform-tools/sqlite3"
+    private fun _openDb(): SQLiteDatabase {
+        return SQLiteDatabase.openDatabase(
+            _dbPath(),
+            null,
+            SQLiteDatabase.OPEN_READWRITE
+        )
     }
 
-    private fun _sqlExec(dbPath: String, sql: String, args: List<Any>? = null) {
-        val cmd = buildList {
-            add(_sqliteBin())
-            add(dbPath)
-            val stmt = if (args == null) sql else {
-                var s = sql
-                args.forEach { s = s.replaceFirst("?", "'${it}'") }
-                s
+    private fun _sqlCount(query: String): Int {
+        val db = _openDb()
+        return try {
+            val cursor = db.rawQuery(query, null)
+            val count = if (cursor.moveToFirst()) cursor.getInt(0) else 0
+            cursor.close()
+            count
+        } finally {
+            db.close()
+        }
+    }
+
+    private fun _sqlLongOrNull(query: String): Long? {
+        val db = _openDb()
+        return try {
+            val cursor = db.rawQuery(query, null)
+            val result = if (cursor.moveToFirst()) cursor.getLong(0) else null
+            cursor.close()
+            result
+        } finally {
+            db.close()
+        }
+    }
+
+    private fun _sqlExec(sql: String, args: List<String?> = emptyList()) {
+        val db = _openDb()
+        try {
+            if (args.isEmpty()) {
+                db.execSQL(sql)
+            } else {
+                db.execSQL(sql, args.toTypedArray())
             }
-            add(stmt)
+        } finally {
+            db.close()
         }
-        val exit = ProcessBuilder(*cmd.toTypedArray())
-            .redirectErrorStream(true)
-            .start()
-            .waitFor()
-        if (exit != 0) throw RuntimeException("sqlite3 exited $exit")
-    }
-
-    private fun _sqlCount(dbPath: String, sql: String): Int {
-        val out = _sqlQuery(dbPath, sql)
-        return out.trim().toIntOrNull() ?: throw RuntimeException("unexpected sqlite output: $out")
-    }
-
-    private fun _sqlLongOrNull(dbPath: String, sql: String): Long? {
-        val out = _sqlQuery(dbPath, sql).trim()
-        return if (out.isEmpty() || out == "None") null else out.toLongOrNull()
-    }
-
-    private fun _sqlQuery(dbPath: String, sql: String): String {
-        val cmd = arrayOf(_sqliteBin(), dbPath, sql)
-        val proc = ProcessBuilder(*cmd)
-            .redirectErrorStream(true)
-            .start()
-        val output = proc.inputStream.bufferedReader().readText()
-        val exit = proc.waitFor()
-        if (exit != 0) throw RuntimeException("sqlite3 exited $exit: $output")
-        return output
     }
 
     // ----------------------------------------------------------------
