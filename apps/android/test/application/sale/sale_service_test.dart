@@ -3,6 +3,8 @@ import 'package:songjog/application/sale/sale_service.dart';
 import 'package:songjog/data/local/in_memory_store.dart';
 import 'package:songjog/data/repositories/business_repository.dart';
 import 'package:songjog/domain/models/business_profile.dart';
+import 'package:songjog/domain/models/customer.dart';
+import 'package:songjog/domain/models/product.dart';
 import 'package:songjog/domain/models/transaction.dart';
 import 'package:songjog/domain/services/diagnostic_collector.dart';
 
@@ -20,6 +22,36 @@ class _ThrowingRepo implements BusinessRepository {
 
   @override
   Future<List<TransactionRecord>> getTransactions() async => const [];
+
+  @override
+  Future<void> saveCustomer(Customer customer) async => throw StateError('disk failure');
+
+  @override
+  Future<void> deleteCustomer(String id) async => throw StateError('disk failure');
+
+  @override
+  Future<List<Customer>> getCustomers() async => const [];
+
+  @override
+  Future<Customer?> getCustomer(String id) async => null;
+
+  @override
+  Future<void> saveProduct(Product product) async => throw StateError('disk failure');
+
+  @override
+  Future<void> deleteProduct(String id) async => throw StateError('disk failure');
+
+  @override
+  Future<List<Product>> getProducts() async => const [];
+
+  @override
+  Future<Product?> getProduct(String id) async => null;
+
+  @override
+  Future<Map<String, dynamic>> getFinancialSummary({DateTime? from, DateTime? to}) async => {};
+
+  @override
+  Future<int> getCustomerOpenBalance(String customerId) async => 0;
 }
 
 void main() {
@@ -159,7 +191,7 @@ void main() {
 
     test('persists a paid single-line sale', () async {
       final record = await service.saveSale(
-        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000)],
+        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000, costMinor: null)],
         paidMinor: 85000,
         paymentMethod: PaymentMethod.cash,
       );
@@ -182,9 +214,9 @@ void main() {
     test('multi-line totals are summed', () async {
       final record = await service.saveSale(
         lines: [
-          (description: 'Mouse', quantity: 1, priceMinor: 85000),
-          (description: 'Windows setup', quantity: 1, priceMinor: 80000),
-          (description: 'Printing', quantity: 50, priceMinor: 300),
+          (description: 'Mouse', quantity: 1, priceMinor: 85000, costMinor: null),
+          (description: 'Windows setup', quantity: 1, priceMinor: 80000, costMinor: null),
+          (description: 'Printing', quantity: 50, priceMinor: 300, costMinor: null),
         ],
         paidMinor: 100000,
       );
@@ -196,7 +228,7 @@ void main() {
 
     test('overpayment is clamped, never stored beyond the total', () async {
       final record = await service.saveSale(
-        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000)],
+        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000, costMinor: null)],
         paidMinor: 90000,
       );
       expect(record.paidMinor, 85000);
@@ -205,7 +237,7 @@ void main() {
 
     test('zero payment is unpaid', () async {
       final record = await service.saveSale(
-        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000)],
+        lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000, costMinor: null)],
       );
       expect(record.paidMinor, 0);
       expect(record.paymentStatus, PaymentStatus.unpaid);
@@ -219,7 +251,7 @@ void main() {
       final failing = SaleEntryService(_ThrowingRepo(), collector);
       await expectLater(
         failing.saveSale(
-          lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000)],
+          lines: [(description: 'Mouse', quantity: 1, priceMinor: 85000, costMinor: null)],
         ),
         throwsStateError,
       );

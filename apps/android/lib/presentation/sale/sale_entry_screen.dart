@@ -188,6 +188,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
               description: line.description.text.trim(),
               quantity: line.parsedQuantity!,
               priceMinor: line.parsedPriceMinor!,
+              costMinor: null,
             ),
         ],
         paidMinor: clampPaid(paid, _totalMinor),

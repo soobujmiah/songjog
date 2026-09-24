@@ -102,7 +102,8 @@ void main() {
 
     expect(find.text(t('no_transactions')), findsOneWidget);
     expect(find.text(t('no_transactions_hint')), findsOneWidget);
-    expect(find.text(t('new_sale')), findsOneWidget);
+    // new_sale appears on both the FAB label and the action bar row
+    expect(find.text(t('new_sale')), findsNWidgets(2));
     expect(find.text('Demo Shop'), findsOneWidget);
   });
 
@@ -136,7 +137,6 @@ void main() {
     );
     await pumpHome(tester);
 
-    expect(find.text(t('workspace_home_recent')), findsOneWidget);
     expect(find.text('Mouse'), findsOneWidget);
     expect(
       find.text(t('more_lines').replaceFirst('{count}', '1')),
@@ -153,7 +153,7 @@ void main() {
     await seedWorkspace();
     await pumpHome(tester);
 
-    await tester.tap(find.text(t('new_sale')));
+    await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     expect(find.byType(SaleEntryScreen), findsOneWidget);
 

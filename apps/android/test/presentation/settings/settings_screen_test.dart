@@ -3,10 +3,12 @@ import 'package:songjog/app/app_services.dart';
 import 'package:songjog/application/onboarding/onboarding_service.dart';
 import 'package:songjog/data/export/share_service.dart';
 import 'package:songjog/data/local/in_memory_store.dart';
+import 'package:songjog/domain/models/business_profile.dart';
+import 'package:songjog/domain/models/customer.dart';
+import 'package:songjog/domain/models/product.dart';
+import 'package:songjog/domain/models/transaction.dart';
 import 'package:songjog/domain/services/export_payload.dart';
 import 'package:songjog/data/repositories/business_repository.dart';
-import 'package:songjog/domain/models/business_profile.dart';
-import 'package:songjog/domain/models/transaction.dart';
 import 'package:songjog/domain/services/diagnostic_collector.dart';
 import 'package:songjog/domain/services/diagnostic_event.dart';
 import 'package:songjog/domain/services/diagnostic_report.dart';
@@ -60,6 +62,45 @@ class _ThrowingStore implements LocalStore {
 
   @override
   Future<List<TransactionRecord>> loadTransactions() async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<void> saveCustomer(Customer customer) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<void> deleteCustomer(String id) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<List<Customer>> getCustomers() async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<Customer?> getCustomer(String id) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<void> saveProduct(Product product) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<void> deleteProduct(String id) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<List<Product>> getProducts() async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<Product?> getProduct(String id) async =>
+      throw StateError('disk failure');
+
+  @override
+  Future<Map<String, dynamic>> getFinancialSummary({
+    DateTime? from,
+    DateTime? to,
+  }) async =>
       throw StateError('disk failure');
 }
 

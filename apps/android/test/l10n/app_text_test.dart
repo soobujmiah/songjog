@@ -98,4 +98,47 @@ void main() {
       expect(calculateReturnable(100000, 85000), 15000);
     });
   });
+
+  group('New v0.2 keys', () {
+    test('dashboard and action bar keys', () {
+      expect(AppText.get(AppLocale.bangla, 'dashboard_sales_today'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'dashboard_sales_today'), "Today's sales");
+      expect(AppText.get(AppLocale.bangla, 'dashboard_expenses_today'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'dashboard_expenses_today'), "Today's expenses");
+      expect(AppText.get(AppLocale.bangla, 'dashboard_profit'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'dashboard_profit'), 'Net profit');
+      expect(AppText.get(AppLocale.bangla, 'dashboard_outstanding_dues'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'dashboard_outstanding_dues'), 'Outstanding dues');
+      expect(AppText.get(AppLocale.bangla, 'no_financial_data'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'no_financial_data'), 'No data');
+      expect(AppText.get(AppLocale.bangla, 'new_expense'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'new_expense'), 'New expense');
+      expect(AppText.get(AppLocale.bangla, 'new_purchase'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'new_purchase'), 'New purchase');
+    });
+
+    test('customer and product keys', () {
+      expect(AppText.get(AppLocale.bangla, 'customers'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'customers'), 'Customers');
+      expect(AppText.get(AppLocale.bangla, 'products'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'products'), 'Products');
+      expect(AppText.get(AppLocale.bangla, 'new_customer'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'new_customer'), 'New customer');
+      expect(AppText.get(AppLocale.bangla, 'new_product'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'new_product'), 'New product');
+      expect(AppText.get(AppLocale.bangla, 'no_customers'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'no_customers'), 'No customers yet');
+      expect(AppText.get(AppLocale.bangla, 'no_products'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'no_products'), 'No products yet');
+      expect(AppText.get(AppLocale.bangla, 'no_customer_transactions'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'no_customer_transactions'), 'No transactions yet');
+    });
+
+    test('receipt share keys', () {
+      expect(AppText.get(AppLocale.bangla, 'share_receipt'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'share_receipt'), 'Share receipt');
+      expect(AppText.get(AppLocale.bangla, 'receipt_header'), isNotEmpty);
+      expect(AppText.get(AppLocale.english, 'receipt_header'), 'Receipt');
+    });
+  });
 }

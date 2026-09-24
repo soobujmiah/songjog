@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app_services.dart';
 import 'domain/models/business_profile.dart';
@@ -7,13 +8,19 @@ import 'l10n/app_text.dart';
 import 'presentation/welcome/welcome_page.dart';
 import 'presentation/workspace/workspace_home_page.dart';
 
+const _localeKey = 'songjog_locale';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final services = await AppServices.create();
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocale = prefs.getString(_localeKey);
+  final initialLocale = savedLocale == 'english' ? AppLocale.english : AppLocale.bangla;
+
+  final services = await AppServices.create(locale: initialLocale);
   _installGlobalErrorHandlers(services);
 
-  runApp(SongjogApp(services: services));
+  runApp(SongjogApp(services: services, locale: initialLocale));
 }
 
 /// Routes uncaught framework and platform errors into the diagnostic
@@ -61,9 +68,11 @@ class _SongjogAppState extends State<SongjogApp> {
       widget.services.repository.getProfile();
   late AppLocale _locale = widget.locale;
 
-  void _setLocale(AppLocale locale) {
+  void _setLocale(AppLocale locale) async {
     if (_locale != locale) {
       setState(() => _locale = locale);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_localeKey, locale == AppLocale.bangla ? 'bangla' : 'english');
     }
   }
 
@@ -77,8 +86,6 @@ class _SongjogAppState extends State<SongjogApp> {
         colorSchemeSeed: const Color(0xFF126B5A),
         scaffoldBackgroundColor: const Color(0xFFF7F8F6),
       ),
-      // Existing workspace goes straight to the workspace home; a fresh
-      // install starts at the welcome page.
       home: FutureBuilder<BusinessProfile?>(
         future: _profile,
         builder: (context, snapshot) {

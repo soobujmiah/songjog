@@ -1,7 +1,10 @@
+
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/business_profile.dart';
+import '../../domain/models/customer.dart';
+import '../../domain/models/product.dart';
 import '../../domain/models/transaction.dart';
 import 'in_memory_store.dart';
 
@@ -9,7 +12,7 @@ class SqliteStore implements LocalStore {
   SqliteStore._(this._db);
 
   static const databaseName = 'songjog.db';
-  static const databaseVersion = 2;
+  static const databaseVersion = 3;
 
   final Database _db;
 
@@ -86,6 +89,22 @@ class SqliteStore implements LocalStore {
     await db.execute(
       'CREATE INDEX idx_transactions_customer_id ON transactions(customer_id)',
     );
+    await db.execute('''
+      CREATE TABLE customers (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        phone TEXT
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE products (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        selling_price_minor INTEGER NOT NULL,
+        cost_price_minor INTEGER,
+        category TEXT
+      )
+    ''');
   }
 
   static Future<void> _upgradeSchema(
@@ -100,6 +119,24 @@ class SqliteStore implements LocalStore {
       await db.execute(
         'CREATE INDEX idx_transactions_customer_id ON transactions(customer_id)',
       );
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE customers (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          phone TEXT
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE products (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          selling_price_minor INTEGER NOT NULL,
+          cost_price_minor INTEGER,
+          category TEXT
+        )
+      ''');
     }
   }
 
@@ -208,6 +245,171 @@ class SqliteStore implements LocalStore {
       ));
     }
     return result;
+  }
+
+  @override
+  Future<void> saveCustomer(Customer customer) async {
+    await _db.insert(
+      'customers',
+      {'id': customer.id, 'name': customer.name, 'phone': customer.phone},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> deleteCustomer(String id) async {
+    await _db.delete('customers', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<List<Customer>> getCustomers() async {
+    final rows = await _db.query('customers', orderBy: 'name ASC');
+    return rows
+        .map((r) => Customer(
+              id: r['id']! as String,
+              name: r['name']! as String,
+              phone: r['phone'] as String?,
+            ))
+        .toList();
+  }
+
+  @override
+  Future<Customer?> getCustomer(String id) async {
+    final rows = await _db.query('customers', where: 'id = ?', whereArgs: [id], limit: 1);
+    if (rows.isEmpty) return null;
+    final r = rows.first;
+    return Customer(
+      id: r['id']! as String,
+      name: r['name']! as String,
+      phone: r['phone'] as String?,
+    );
+  }
+
+  @override
+  Future<void> saveProduct(Product product) async {
+    await _db.insert(
+      'products',
+      {
+        'id': product.id,
+        'name': product.name,
+        'selling_price_minor': product.sellingPriceMinor,
+        'cost_price_minor': product.costPriceMinor,
+        'category': product.category,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> deleteProduct(String id) async {
+    await _db.delete('products', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<List<Product>> getProducts() async {
+    final rows = await _db.query('products', orderBy: 'name ASC');
+    return rows
+        .map((r) => Product(
+              id: r['id']! as String,
+              name: r['name']! as String,
+              sellingPriceMinor: r['selling_price_minor']! as int,
+              costPriceMinor: r['cost_price_minor'] as int?,
+              category: r['category'] as String?,
+            ))
+        .toList();
+  }
+
+  @override
+  Future<Product?> getProduct(String id) async {
+    final rows = await _db.query('products', where: 'id = ?', whereArgs: [id], limit: 1);
+    if (rows.isEmpty) return null;
+    final r = rows.first;
+    return Product(
+      id: r['id']! as String,
+      name: r['name']! as String,
+      sellingPriceMinor: r['selling_price_minor']! as int,
+      costPriceMinor: r['cost_price_minor'] as int?,
+      category: r['category'] as String?,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getFinancialSummary({
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    List<Map<String, dynamic>> txRows;
+    if (from != null && to != null) {
+      txRows = await _db.query(
+        'transactions',
+        where: 'created_at >= ? AND created_at <= ?',
+        whereArgs: [from.millisecondsSinceEpoch, to.millisecondsSinceEpoch],
+        orderBy: 'created_at DESC',
+      );
+    } else if (from != null) {
+      txRows = await _db.query(
+        'transactions',
+        where: 'created_at >= ?',
+        whereArgs: [from.millisecondsSinceEpoch],
+        orderBy: 'created_at DESC',
+      );
+    } else if (to != null) {
+      txRows = await _db.query(
+        'transactions',
+        where: 'created_at <= ?',
+        whereArgs: [to.millisecondsSinceEpoch],
+        orderBy: 'created_at DESC',
+      );
+    } else {
+      txRows = await _db.query('transactions', orderBy: 'created_at DESC');
+    }
+
+    int salesTotal = 0;
+    int grossProfit = 0;
+    int expenseTotal = 0;
+    int outstandingDues = 0;
+
+    for (final row in txRows) {
+      final type = row['type'] as String;
+      final paidMinor = row['paid_minor'] as int;
+      final paymentStatus = row['payment_status'] as String;
+
+      final lineRows = await _db.query(
+        'transaction_lines',
+        where: 'transaction_id = ?',
+        whereArgs: [row['id']],
+      );
+      final lineTotal = lineRows.fold<int>(
+        0,
+        (s, l) => s + ((l['selling_price_minor']! as int) * (l['quantity']! as num).toDouble()).round(),
+      );
+      final lineCost = lineRows.fold<int?>(
+        0,
+        (acc, l) {
+          final cost = l['actual_cost_minor'] as int?;
+          if (cost == null) return null;
+          return acc! + (cost * (l['quantity']! as num).toDouble()).round();
+        },
+      );
+
+      if (type == 'sale' || type == 'serviceSale') {
+        salesTotal += lineTotal;
+        if (lineCost != null) grossProfit += lineTotal - lineCost;
+      } else if (type == 'expense') {
+        expenseTotal += lineTotal;
+      }
+
+      if (paymentStatus == 'unpaid' || paymentStatus == 'partial') {
+        outstandingDues += lineTotal - paidMinor;
+      }
+    }
+
+    return {
+      'sales': salesTotal,
+      'grossProfit': grossProfit,
+      'expenses': expenseTotal,
+      'outstandingDues': outstandingDues,
+    };
   }
 
   Future<void> close() => _db.close();

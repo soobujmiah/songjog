@@ -87,15 +87,17 @@ class SaleEntryService {
   final BusinessRepository _repository;
   final DiagnosticCollector? _diagnostics;
 
-  /// Persists a sale. The received amount is clamped into `[0, total]` so a
-  /// payment can never silently exceed the applicable balance.
+  /// Persists a transaction (sale, expense, or purchase). The received amount
+  /// is clamped into `[0, total]` so a payment can never silently exceed the
+  /// applicable balance.
   Future<TransactionRecord> saveSale({
-    required List<({String description, double quantity, int priceMinor})> lines,
+    required List<({String description, double quantity, int priceMinor, int? costMinor})> lines,
     int paidMinor = 0,
     PaymentMethod? paymentMethod,
+    TransactionType type = TransactionType.sale,
   }) async {
     if (lines.isEmpty) {
-      throw ArgumentError('A sale needs at least one line.');
+      throw ArgumentError('A transaction needs at least one line.');
     }
     final now = DateTime.now();
     final recordLines = [
@@ -105,21 +107,24 @@ class SaleEntryService {
           description: lines[i].description,
           quantity: lines[i].quantity,
           sellingPriceMinor: lines[i].priceMinor,
+          actualCostMinor: lines[i].costMinor,
         ),
     ];
     final total = recordLines.fold<int>(
       0,
       (sum, line) => sum + line.lineTotalMinor,
     );
-    final clamped = clampPaid(paidMinor, total);
+    final clamped = type == TransactionType.expense ? 0 : clampPaid(paidMinor, total);
     final record = TransactionRecord(
       id: now.microsecondsSinceEpoch.toString(),
-      type: TransactionType.sale,
+      type: type,
       createdAt: now,
       lines: recordLines,
       paymentMethod: paymentMethod,
       paidMinor: clamped,
-      paymentStatus: derivePaymentStatus(totalMinor: total, paidMinor: clamped),
+      paymentStatus: type == TransactionType.expense
+          ? PaymentStatus.paid
+          : derivePaymentStatus(totalMinor: total, paidMinor: clamped),
     );
     try {
       await _repository.saveTransaction(record);
@@ -127,7 +132,7 @@ class SaleEntryService {
         level: 'info',
         category: 'transaction',
         operation: 'transaction_save',
-        message: 'sale saved',
+        message: '${type.name} saved',
         details: {
           'lines': record.lines.length,
           'total_minor': total,
@@ -140,7 +145,7 @@ class SaleEntryService {
         level: 'error',
         category: 'transaction',
         operation: 'transaction_save',
-        message: 'sale save failed',
+        message: '${type.name} save failed',
         error: error.toString(),
         stackTrace: stack.toString(),
       );

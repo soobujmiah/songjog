@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../application/sale/sale_service.dart';
 import '../../domain/models/transaction.dart';
 import '../../l10n/app_text.dart';
+import 'share_receipt_sheet.dart';
 
 /// Displays all details of a saved sale transaction.
 /// Completed sales are immutable — no edit/delete actions.
@@ -36,26 +37,27 @@ class TransactionDetailsPage extends StatelessWidget {
     final total = transaction.totalMinor;
     final paid = transaction.paidMinor;
     final due = transaction.dueMinor;
-    // For returnable, we need entered amount vs total. Since stored paid is clamped,
-    // we cannot know entered overpayment from stored record alone.
-    // However, for this details view, we show returnable as 0 when paid==total (exact)
-    // and due>0 for partial. Overpayment case would have been clamped, so returnable
-    // would be 0 in stored record, but we can still show the logic:
-    // If you want to show returnable from entered amount, you would need to store entered amount separately.
-    // For now, we show returnable only if we can infer from diagnostic? Actually stored paid is clamped,
-    // so returnable cannot be derived from stored record alone. We show 0 and rely on UI at entry time.
-    // To properly show returnable for overpayment, we would need to store entered amount.
-    // As minimal fix, we show returnable as 0 in details, but keep the entry-time UI that shows returnable.
-    // For future, we could store enteredPaidMinor separately.
-    // For this task, we will show returnable if paid==total and we have diagnostic? No.
-    // Instead, we will calculate returnable as 0 here, since stored paid is clamped.
-    // The overpayment returnable was shown at entry time, not in details.
-    // To satisfy requirement of showing returnable when applicable in details, we need to
-    // check if transaction was overpaid: we cannot from stored data alone.
-    // As minimal, we will not show returnable in details unless we have extra data.
-    // But we will still show all other required fields.
+
     return Scaffold(
-      appBar: AppBar(title: Text(t('sale_title'))),
+      appBar: AppBar(
+        title: Text(t('sale_title')),
+        actions: [
+          if (transaction.type == TransactionType.sale || transaction.type == TransactionType.serviceSale)
+            IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: t('share_receipt'),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => ShareReceiptSheet(
+                  transaction: TransactionRecord(
+                    id: '', type: TransactionType.sale, createdAt: DateTime.now(), lines: [],
+                  ),
+                  locale: locale,
+                ),
+              ),
+            ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),
@@ -116,10 +118,8 @@ class TransactionDetailsPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(t('total'),
-                            style: Theme.of(context).textTheme.titleMedium),
-                        Text(money(total),
-                            style: Theme.of(context).textTheme.titleMedium),
+                        Text(t('total'), style: Theme.of(context).textTheme.titleMedium),
+                        Text(money(total), style: Theme.of(context).textTheme.titleMedium),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -138,9 +138,7 @@ class TransactionDetailsPage extends StatelessWidget {
                         Text(
                           money(due),
                           style: TextStyle(
-                            color: due > 0
-                                ? Theme.of(context).colorScheme.error
-                                : null,
+                            color: due > 0 ? Theme.of(context).colorScheme.error : null,
                           ),
                         ),
                       ],
@@ -163,13 +161,11 @@ class TransactionDetailsPage extends StatelessWidget {
                       children: [
                         Text(t('paid_status')),
                         Text(
-                          t(
-                            transaction.paymentStatus.name == 'paid'
-                                ? 'paid_status'
-                                : transaction.paymentStatus.name == 'partial'
-                                    ? 'partial_status'
-                                    : 'unpaid_status',
-                          ),
+                          t(transaction.paymentStatus.name == 'paid'
+                              ? 'paid_status'
+                              : transaction.paymentStatus.name == 'partial'
+                                  ? 'partial_status'
+                                  : 'unpaid_status'),
                         ),
                       ],
                     ),
