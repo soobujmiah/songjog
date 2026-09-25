@@ -132,7 +132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Defer navigation pop to microtask so parent setState propagates first
                   Future.microtask(() {
                     widget.onLocaleChanged?.call(value);
-                    Navigator.of(context).pop();
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
                   });
                 }
               },
