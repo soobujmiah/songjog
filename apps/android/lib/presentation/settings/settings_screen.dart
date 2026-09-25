@@ -129,12 +129,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               groupValue: widget.locale,
               onChanged: (value) {
                 if (value != null) {
-                  // Defer navigation pop to microtask so parent setState propagates first
-                  Future.microtask(() {
-                    widget.onLocaleChanged?.call(value);
-                    if (!mounted) return;
-                    Navigator.of(context).pop();
-                  });
+                  // Capture the navigator synchronously (no BuildContext use after the async
+                  // gap below -- avoids use_build_context_synchronously) and defer the pop to
+                  // a microtask so the parent's setState propagates first.
+                  final navigator = Navigator.of(context);
+                  widget.onLocaleChanged?.call(value);
+                  Future.microtask(navigator.pop);
                 }
               },
               child: Column(
