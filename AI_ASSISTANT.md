@@ -1,0 +1,15 @@
+# AI Assistant Working Agreement — Songjog
+
+**SKB continuity:** Songjog operates under Sobuj's canonical knowledge base: `soobujmiah/skb`. Before any non-trivial decision, read this file, then consult `soobujmiah/skb` → `ASSISTANT_CONTEXT.md`, loading only the minimum relevant SKB context for the task.
+
+A user must not need to repeat "read SKB" across sessions for this repository. If SKB is unavailable, continue only from verified local evidence — never fabricate SKB context.
+
+**Source of truth (in order):** source code + tests → `README.md` → `docs/` → this file → live GitHub Actions CI. When they disagree, source and live CI win.
+
+**Build authority:** All Android APK/AAB builds go through GitHub Actions (`.github/workflows/flutter-ci.yml`). Never run `flutter build apk` or `gradlew assemble*` locally. See `soobujmiah/skb` → `standards/build-authority.md`.
+
+**Android device testing:** ADB-first. See `soobujmiah/skb` → `standards/agent-device-testing.md`. Target app is `com.songjog.songjog`. Termux PRoot (Debian) is the workstation boundary — return there after every test excursion.
+
+**Session close:** Review `git diff`/`git status`, confirm CI green for touched paths, update `docs/phases/` if a milestone changed, then commit and push. Run the SKB knowledge-return review — identify durable facts worth recording in `soobujmiah/skb`. Never leave validated work staged or unpushed.
+
+**Evidence discipline:** State exactly what was verified and what remains unknown. Distinguish BUILT / MANUALLY TESTED / DEVICE-QUALIFIED / NOT TESTED. Do not claim GPU/NPU acceleration, offline operation, or commercial readiness without direct evidence this session.
