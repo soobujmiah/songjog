@@ -30,6 +30,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String t(String key) => AppText.get(widget.locale, key);
 
+  String localeName(AppLocale locale) => t(locale == AppLocale.bangla ? 'language_bangla' : 'language_english');
+
   Future<void> _runExport(ExportType type) async {
     setState(() => _busy = true);
     final operation = 'export_${type.name}';
@@ -127,8 +129,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               groupValue: widget.locale,
               onChanged: (value) {
                 if (value != null) {
+                  // Capture the navigator synchronously (no BuildContext use after the async
+                  // gap below -- avoids use_build_context_synchronously) and defer the pop to
+                  // a microtask so the parent's setState propagates first.
+                  final navigator = Navigator.of(context);
                   widget.onLocaleChanged?.call(value);
-                  Navigator.of(context).pop();
+                  Future.microtask(navigator.pop);
                 }
               },
               child: Column(

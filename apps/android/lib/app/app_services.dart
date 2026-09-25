@@ -36,7 +36,8 @@ class AppServices {
     required this.shareService,
     required this.exportFileAdapter,
     required this.appVersionLabel,
-  });
+    AppLocale locale = AppLocale.bangla,
+  }) : _locale = locale;
 
   /// Durable (or in-memory fallback) business data store.
   final LocalStore store;
@@ -58,6 +59,11 @@ class AppServices {
 
   /// Human-readable version/build label, e.g. `0.1.0 (1)`.
   final String appVersionLabel;
+
+  AppLocale _locale;
+  AppLocale get currentLocale => _locale;
+
+  void setLocale(AppLocale locale) => _locale = locale;
 
   static Future<AppServices> create({AppLocale locale = AppLocale.bangla}) async {
     // Persistent diagnostic log, wired before any work that may fail so the
