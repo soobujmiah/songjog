@@ -10,6 +10,18 @@ import 'presentation/workspace/workspace_home_page.dart';
 
 const _localeKey = 'songjog_locale';
 
+/// Global locale accessor so any screen can read the current locale without
+/// threading it through every widget constructor or navigating back to the root.
+AppLocale _currentLocale = AppLocale.bangla;
+AppLocale get globalLocale => _currentLocale;
+
+Future<void> setLocale(AppLocale locale) async {
+  if (_currentLocale == locale) return;
+  _currentLocale = locale;
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString(_localeKey, locale == AppLocale.bangla ? 'bangla' : 'english');
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -70,9 +82,9 @@ class _SongjogAppState extends State<SongjogApp> {
 
   void _setLocale(AppLocale locale) async {
     if (_locale != locale) {
-      setState(() => _locale = locale);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_localeKey, locale == AppLocale.bangla ? 'bangla' : 'english');
+      _locale = locale;
+      widget.services.setLocale(locale);
+      await setLocale(locale);
     }
   }
 

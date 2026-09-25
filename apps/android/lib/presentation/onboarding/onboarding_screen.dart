@@ -33,6 +33,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   String t(String key) => AppText.get(widget.locale, key);
 
+  String kindLabel(WorkspaceKind kind) {
+    final key = kind == WorkspaceKind.business ? 'workspace_kind_business' : 'workspace_kind_institution';
+    return t(key);
+  }
+
+  String businessTypeLabel(BusinessType type) {
+    final suffix = type.name; // camelCase name from enum
+    return t('business_type_$suffix');
+  }
+
   @override
   void dispose() {
     _name.dispose();
@@ -101,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               decoration: InputDecoration(labelText: t('workspace_type')),
               items: WorkspaceKind.values.map((kind) => DropdownMenuItem(
                 value: kind,
-                child: Text(kind.name),
+                child: Text(kindLabel(kind)),
               )).toList(),
               onChanged: (value) => setState(() => _workspaceKind = value!),
             ),
@@ -111,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               decoration: InputDecoration(labelText: t('business_type')),
               items: BusinessType.values.map((type) => DropdownMenuItem(
                 value: type,
-                child: Text(type.name),
+                child: Text(businessTypeLabel(type)),
               )).toList(),
               onChanged: (value) => setState(() => _businessType = value!),
             ),

@@ -97,7 +97,13 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   PaymentMethod? _method;
   bool _saving = false;
 
+  bool get includeCost => widget.defaultType == TransactionType.purchase;
+
   String t(String key) => AppText.get(widget.locale, key);
+
+  String costLabel() => widget.defaultType == TransactionType.purchase
+      ? t('purchase_cost_price')
+      : t('product_cost');
 
   String money(int minor) {
     final taka = minorToTaka(minor);
@@ -325,7 +331,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                 ),
               ],
             ),
-            if (line.includeCost) ...[
+            if (includeCost) ...[
               const SizedBox(height: 8),
               TextField(
                 controller: line.cost,
@@ -334,7 +340,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9০-৯.]')),
                   _BanglaDigitFormatter(widget.locale),
                 ],
-                decoration: InputDecoration(labelText: t('product_cost')),
+                decoration: InputDecoration(labelText: costLabel()),
               ),
             ],
             if (lineTotal != null)
