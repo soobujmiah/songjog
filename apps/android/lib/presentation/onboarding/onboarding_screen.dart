@@ -39,7 +39,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   String businessTypeLabel(BusinessType type) {
-    final suffix = type.name; // camelCase name from enum
+    // type.name is the camelCase enum identifier (e.g. "generalShop"); the
+    // translation keys in AppText are snake_case ("business_type_general_shop").
+    final suffix = type.name.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (match) => '_${match.group(0)!.toLowerCase()}',
+    );
     return t('business_type_$suffix');
   }
 
