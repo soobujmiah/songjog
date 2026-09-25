@@ -1,30 +1,33 @@
 schema_version: 1
 project_id: songjog
 repository: soobujmiah/songjog
-generated_at: '2026-09-25T13:04:07Z'
-generated_by: tools/repo_knowledge init
-version: 62b9f6c
+generated_at: '2026-09-25T13:17:18Z'
+generated_by: tools/repo_knowledge collect
+version: '6425828'
 head:
-  commit: 62b9f6c07b6de6dc1ee05e2b8affa8823f14bd64
+  commit: 6425828cc2c1aa23f3278c585d03ca99a47ea200
   branch: main
-  committed_at: '2026-09-25T13:02:02Z'
+  committed_at: '2026-09-25T13:15:48Z'
 phases:
   source: not_configured
   completed: []
   active: null
   next: null
 build:
-  status: unknown
-  run_id: null
-  at: null
+  status: passed
+  run_id: '36139856946'
+  at: '2026-09-25T13:17:18Z'
 test:
-  status: unknown
+  status: passed
   run_id: null
-  at: null
-  summary: null
-last_successful_build: null
+  at: '2026-09-25T13:17:18Z'
+  summary: flutter test (apps/android)
+last_successful_build:
+  commit: 6425828cc2c1aa23f3278c585d03ca99a47ea200
+  at: '2026-09-25T13:17:18Z'
+  run_id: '36139856946'
 last_failed_build: null
 sync:
-  status: pending
-  last_synced_at: '2026-09-25T13:04:07Z'
-  source: local
+  status: ok
+  last_synced_at: '2026-09-25T13:17:18Z'
+  source: ci
