@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 590" role="img" aria-labelledby="title desc">
+<title id="title">Songjog Owner Edition operating flow</title>
+<desc id="desc">Diagram showing Bengali-first daily entry flowing into auditable records, customer documents, private business data and offline-capable operations.</desc>
+<defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#07140d"/><stop offset="1" stop-color="#0b2115"/></linearGradient><linearGradient id="card" x1="0" x2="1"><stop stop-color="#10291a"/><stop offset="1" stop-color="#0b1d13"/></linearGradient></defs>
+<rect width="1200" height="590" rx="28" fill="url(#bg)"/>
+<text x="55" y="55" fill="#8ff0ad" font-family="sans-serif" font-size="15" font-weight="700" letter-spacing="3">SONGJOG · সংযোগ · OWNER EDITION</text>
+<text x="55" y="91" fill="#fff" font-family="sans-serif" font-size="27" font-weight="700">দৈনন্দিন হিসাব এক জায়গায় — fast, private, auditable</text>
+<g font-family="sans-serif">
+<rect x="55" y="150" width="245" height="165" rx="20" fill="url(#card)" stroke="#2c6b43"/><text x="80" y="184" fill="#8ff0ad" font-size="13" font-weight="700">01 · ENTRY</text><text x="80" y="220" fill="#fff" font-size="21" font-weight="700">দ্রুত দৈনিক এন্ট্রি</text><text x="80" y="250" fill="#b8cfc0" font-size="14">Bengali-first UI</text><text x="80" y="276" fill="#b8cfc0" font-size="14">minimal mandatory fields</text>
+<rect x="330" y="150" width="245" height="165" rx="20" fill="url(#card)" stroke="#2c6b43"/><text x="355" y="184" fill="#8ff0ad" font-size="13" font-weight="700">02 · RECORD</text><text x="355" y="220" fill="#fff" font-size="21" font-weight="700">Reliable records</text><text x="355" y="250" fill="#b8cfc0" font-size="14">corrections / returns</text><text x="355" y="276" fill="#b8cfc0" font-size="14">no destructive deletion</text>
+<rect x="605" y="150" width="245" height="165" rx="20" fill="url(#card)" stroke="#2c6b43"/><text x="630" y="184" fill="#8ff0ad" font-size="13" font-weight="700">03 · OUTPUT</text><text x="630" y="220" fill="#fff" font-size="21" font-weight="700">Customer documents</text><text x="630" y="250" fill="#b8cfc0" font-size="14">private cost / margin</text><text x="630" y="276" fill="#b8cfc0" font-size="14">never exposed on documents</text>
+<rect x="880" y="150" width="265" height="165" rx="20" fill="url(#card)" stroke="#2c6b43"/><text x="905" y="184" fill="#8ff0ad" font-size="13" font-weight="700">04 · OPERATION</text><text x="905" y="220" fill="#fff" font-size="21" font-weight="700">Offline-capable</text><text x="905" y="250" fill="#b8cfc0" font-size="14">entitlement-aware operation</text><text x="905" y="276" fill="#b8cfc0" font-size="14">private business data</text>
+<rect x="240" y="390" width="720" height="105" rx="20" fill="#123820" stroke="#67d88c" stroke-width="2"/><text x="270" y="426" fill="#9af4b5" font-size="13" font-weight="700">AUDITABLE BUSINESS FLOW</text><text x="270" y="456" fill="#fff" font-size="19" font-weight="700">Entry → record → correction → document → review</text><text x="270" y="480" fill="#c4ddcc" font-size="13">Owner Edition first; staff, education/training and healthcare workflows remain later boundaries.</text>
+</g>
+<g stroke="#69dc8e" stroke-width="3" fill="none"><path d="M300 232h30"/><path d="M575 232h30"/><path d="M850 232h30"/><path d="M740 315v75"/></g>
+<text x="55" y="550" fill="#8da897" font-family="sans-serif" font-size="13">Product boundary: implementation and test status are reported only when actually present and verified.</text>
+</svg>
