@@ -2,6 +2,8 @@
 
 Songjog (সংযোগ) is an Android-first, Bengali-first business and institution operations app for shops, service businesses, and later education/training and healthcare institutions.
 
+![Songjog Owner Edition operating flow](docs/assets/songjog-owner-edition-flow.svg)
+
 ## Product promise
 
 **দৈনন্দিন হিসাব এক জায়গায়।**
