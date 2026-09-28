@@ -67,7 +67,7 @@ A feature is not release-ready because its documentation exists. It must pass th
 - [ ] Motion/reduced-motion behavior
 - [ ] Touch target and keyboard checks
 - [x] Bangla numerals — `toBanglaDigits` converts Latin 0-9 to Bangla ০-৯, `money()` uses Bangla numerals in bn mode (`৳৮৫০`, `৳০`, `৳১৪০০`) and Latin + BDT in en mode (`BDT 850`), verified by `app_text_test.dart` money formatting + `sale_entry_screen_test.dart` Bangla numerals test, CI `33006998608` — **not yet device-validated for numerals (CI-verified only)**
-- [x] Language toggle — Settings language section with `RadioGroup` + `RadioListTile` bn/en (script-pure), `onLocaleChanged` callback in `main.dart` `_locale` state + `WelcomePage` + `WorkspaceHomePage` + `SettingsScreen`, default bn, verified by `settings_screen_test.dart` (settings reachable) — **not yet device-validated for toggle**
+- [x] Language toggle — Settings language section with `RadioGroup` + `RadioListTile` bn/en (script-pure), `onLocaleChanged` callback in `main.dart` rebuilds the active workspace and persists the choice; `settings_screen_test.dart` follows Settings → English → workspace and checks the saved preference (PR #12, CI run `36486253903`, analyze and widget tests passed) — **not yet device-validated for toggle**
 
 ## Gate 8 — Validation
 
