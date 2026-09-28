@@ -2,7 +2,7 @@
 
 A feature is not release-ready because its documentation exists. It must pass the applicable implementation, test and product gates.
 
-**Current whole-flow status:** see `MVP_ACCEPTANCE.md` (2026-09-29 source audit: 0/14 complete, 8 partial, 6 without a usable path). A checked component below proves only the narrow behavior described on that line. It does not complete its parent gate or a P0 release flow. CI passing and a debug APK do not qualify physical-device behavior or commercial release.
+**Current whole-flow status:** see `MVP_ACCEPTANCE.md` (2026-09-29 source audit: 0/14 complete, 6 partial, 8 without a usable path). A checked component below proves only the narrow behavior described on that line. It does not complete its parent gate or a P0 release flow. CI passing and a debug APK do not qualify physical-device behavior or commercial release.
 
 ## Gate 1 — Foundation
 
