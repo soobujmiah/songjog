@@ -82,7 +82,7 @@ class _SongjogAppState extends State<SongjogApp> {
 
   void _setLocale(AppLocale locale) async {
     if (_locale != locale) {
-      _locale = locale;
+      setState(() => _locale = locale);
       widget.services.setLocale(locale);
       await setLocale(locale);
     }

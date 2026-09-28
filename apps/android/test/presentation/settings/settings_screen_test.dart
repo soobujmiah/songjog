@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:songjog/app/app_services.dart';
 import 'package:songjog/application/onboarding/onboarding_service.dart';
 import 'package:songjog/data/export/share_service.dart';
@@ -178,6 +179,7 @@ void main() {
   }
 
   setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     await buildServices();
   });
 
@@ -299,6 +301,26 @@ void main() {
       find.text(AppText.get(AppLocale.bangla, 'language_english')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('changing language updates the workspace and persists the choice',
+      (tester) async {
+    await tester.pumpWidget(SongjogApp(services: services));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(AppText.get(AppLocale.bangla, 'settings')));
+    await tester.pumpAndSettle();
+
+    final englishOption =
+        find.text(AppText.get(AppLocale.bangla, 'language_english'));
+    await tester.ensureVisible(englishOption);
+    await tester.tap(englishOption);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsScreen), findsNothing);
+    expect(find.text(AppText.get(AppLocale.english, 'new_sale')),
+        findsNWidgets(2));
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('songjog_locale'), 'english');
   });
 
   testWidgets('a failing store shows the error state and records it',
