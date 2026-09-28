@@ -11,13 +11,13 @@ Songjog (সংযোগ) is an Android-first, Bengali-first business and instit
 
 **দৈনন্দিন হিসাব এক জায়গায়।**
 
-The Owner Edition prioritizes extremely fast daily entry, reliable financial records, polished customer documents, private cost/margin data, and adaptive workflows by business type.
+The Owner Edition aims to provide fast daily entry, reliable financial records, customer documents, private cost/margin data, and workflows adapted to business type. These are release goals; see the 14-flow status in `docs/MVP_ACCEPTANCE.md` for what the current app can actually do.
 
 ## Current product boundary
 
-The first commercial release is Owner Edition. Staff/team, customer/student/guardian experiences, public-facing features, advanced integrations, education/training workflows, and healthcare workflows are architecturally prepared but must not delay the first owner release.
+The first commercial release is Owner Edition. Staff/team, customer/student/guardian experiences, public-facing features, advanced integrations, education/training workflows, and healthcare workflows are planned for later work and must not delay the first owner release.
 
-## Non-negotiables
+## Release requirements (not all implemented yet)
 
 - Bengali-first and English-first are mutually pure UI modes.
 - User-entered business data is not treated as UI translation content.

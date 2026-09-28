@@ -3,6 +3,29 @@
 **Milestone:** Android-first commercial release
 **Scope:** One owner/admin can run an ordinary small business without a parallel paper ledger or another bookkeeping app.
 
+## Delivery status (source audit, 2026-09-29)
+
+This contract states the *required release behavior*. It is not a list of shipped features. At `main` `a8b5080`, none of the 14 flows below is complete end to end. The current source supports parts of six flows; eight have no usable end-to-end path. CI at `9580c00` passed Flutter tests and a debug APK build, but that does not establish commercial release readiness or device behavior at the current head. The most recent recorded physical-device evidence covers older builds; it must not be used to qualify newer UI.
+
+| Flow | Status | What the current source actually supports / gap |
+| --- | --- | --- |
+| 1. First launch, tour, authentication | Partial | Welcome screen exists; tour and login controls are disabled. |
+| 2. Account and business setup | Partial | Local workspace creation exists; account sign-in and authentication do not. |
+| 3. Product or service setup | Partial | Product entry with price and optional cost exists; it has no widget test and is not connected to sale selection. A distinct service setup flow is absent. |
+| 4. Fast sale | Partial | Manual line entry, totals, payment and local save have tests and older device evidence; selecting a saved product or service is absent. |
+| 5. Service or agent transaction | No usable path | A transaction type exists, but no dedicated entry flow with recipient/reference fields is present. |
+| 6. Customer payment | No usable path | A payment type and balance calculation exist, but no payment entry flow updates a customer's balance. |
+| 7. Expense | Partial | Expense/purchase entry screens are reachable from the workspace; no widget or device evidence qualifies the complete flow. |
+| 8. Customer/supplier ledger | No usable path | Customer list/detail and a calculated open balance exist, but sales cannot attach a customer through the UI; supplier ledger behavior is absent. |
+| 9. Return or refund | No usable path | No reference-based reversal/adjustment flow exists. |
+| 10. Receipt or invoice | No usable path | A text share sheet exists, but the transaction details page passes it an empty transaction, so it cannot produce a valid receipt for that sale. PDF, print and document numbering are absent. |
+| 11. Dashboard | Partial | Today's local summary and recent transactions exist; the full specified breakdown and linked cost/profit workflow are absent. |
+| 12. Reports | No usable path | Exporting raw user data exists; daily/monthly/yearly/custom business reports do not. |
+| 13. Day closing | No usable path | No expected-versus-actual cash closing flow exists. |
+| 14. Backup or sync | No usable path | Local JSON export exists; authenticated cross-device persistence and restore do not. |
+
+Status here means *whole acceptance flow*, not whether a model, screen, or isolated test exists. Change a row to complete only after its entry-to-result path, persistence/financial invariants, relevant CI checks, and current-build device evidence are recorded. See `RELEASE_GATES.md` and `PHYSICAL_DEVICE_VALIDATION.md` for component and device evidence.
+
 ## P0 release flows
 
 1. First launch → welcome/tour → optional skip → authentication.
