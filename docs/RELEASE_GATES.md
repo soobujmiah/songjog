@@ -61,8 +61,8 @@ A feature is not release-ready because its documentation exists. It must pass th
 
 ## Gate 7 — Localization and UX
 
-- [x] Bengali UI script-purity audit — `AppText` bn values contain no Latin letters except placeholders like `{count}` (verified by `app_text_test.dart` script purity test with placeholder stripping), CI `33006998608` (92/92)
-- [x] English UI script-purity audit — `AppText` en values contain no Bengali script (verified by `app_text_test.dart`), CI `33006998608`
+- [x] Bengali `AppText` value check — bn values contain no Latin letters except placeholders like `{count}` (`app_text_test.dart`, historical CI `33006998608`); this does not audit literals outside `AppText`.
+- [x] English `AppText` value check — en values contain no Bengali script (`app_text_test.dart`, historical CI `33006998608`); this does not audit literals outside `AppText`.
 - [ ] Complete localization — `app_text_test.dart` checks key parity inside `AppText`, but it does not cover all literal UI text; `ProductListScreen` and `ShareReceiptSheet` contain Portuguese labels outside `AppText`.
 - [ ] Loading/empty/error/offline states — some loading, empty and error states are present; no complete offline-state or recovery-path validation is recorded.
 - [ ] Accessibility checks
