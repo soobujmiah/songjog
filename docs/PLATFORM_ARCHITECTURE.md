@@ -97,4 +97,4 @@ These are separate permissioned surfaces over the same underlying identity and d
 
 ## Security boundary
 
-The public repository contains no production secrets. Commercial entitlement is server-authoritative. Platform Owner status is a backend role, not a hard-coded master password/code in the application.
+For a commercial release, the public repository and APK must contain no production secrets. Commercial entitlement must be server-authoritative. Platform Owner status must be a backend role, never a hard-coded master password/code in the application. These are architecture requirements, not claims that the backend or entitlement system exists today; see `MVP_ACCEPTANCE.md` and `RELEASE_GATES.md` for current delivery status.

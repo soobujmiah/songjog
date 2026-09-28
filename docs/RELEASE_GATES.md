@@ -2,6 +2,8 @@
 
 A feature is not release-ready because its documentation exists. It must pass the applicable implementation, test and product gates.
 
+**Current whole-flow status:** see `MVP_ACCEPTANCE.md` (2026-09-29 source audit: 0/14 complete, 8 partial, 6 without a usable path). A checked component below proves only the narrow behavior described on that line. It does not complete its parent gate or a P0 release flow. CI passing and a debug APK do not qualify physical-device behavior or commercial release.
+
 ## Gate 1 — Foundation
 
 - [x] Local durable database implemented — `SqliteStore` (schema v2), verified by `sqlite_store_test.dart` via sqflite_common_ffi (2026-08-26); re-verified at `3ebac8b` via CI `32990932079` (74/74 tests)
@@ -19,18 +21,18 @@ A feature is not release-ready because its documentation exists. It must pass th
 
 ## Gate 3 — Daily operations
 
-- [ ] Product/service creation
-- [x] Fast sale — `SaleEntryScreen` + `SaleEntryService` (description/quantity/price in exact minor-unit BDT via `takaToMinor` string/integer parsing, no float, reactive listeners for description/quantity/price/paid via `initState` + `_attachLineListeners` + `_onFieldChanged` setState), **returnable/change** (`calculateReturnable` = entered - total when overpaid, clamped paid stored, due 0, status paid, never store excess as revenue), verified by `sale_service_test.dart` (takaToMinor, minorToTaka, derivePaymentStatus, clampPaid, calculateReturnable, toBanglaDigits) + `sale_entry_screen_test.dart` widget flows (offstage-safe Finder skipOffstage:false + ensureVisible + enterField + tapCompleteSale, returnable UI, Bangla numerals), CI `33006998608` (92/92 PASS at `9e25997`), APK badging `com.songjog.songjog` `0.1.0` `24/36` `Songjog`, **device-validated at `ddce6f7` via Record 3 artifacts `184910.json` (4 sales) + `184952.json` (23 events, 2 sessions, Redmi 25053RT47C) — 17/22 PASS for fast sale core, returnable + Bangla numerals + locale toggle pending device validation**
+- [ ] Product/service creation — product entry UI and repository storage exist, but the complete flow lacks a widget/device test; distinct service setup is absent.
+- [ ] Fast sale acceptance flow — manual line entry, exact minor-unit money parsing, payment/due calculation and local save are implemented and tested (`sale_service_test.dart`, `sale_entry_screen_test.dart`); Record 3 at `ddce6f7` provides historical device evidence for the manual-entry subset. The required selection of a saved product/service is not implemented. Returnable, Bangla numerals and locale behavior added after that device round are not qualified by Record 3.
 - [x] Multi-line transaction — `SaleEntryService.saveSale` accepts `List<({description, quantity, priceMinor})>`, total = sum `lineTotalMinor`, verified by `sale_service_test.dart` multi-line totals (180000) + `sale_entry_screen_test.dart` multi-line widget test, CI `33006998608` (92/92), **device-validated at `ddce6f7` via multi-line sale lines=2 total=1235800 (282800+953000) in diagnostic `184952.json` + user-data `184910.json`**
 - [x] Payment / partial payment / due + Returnable — `derivePaymentStatus` (unpaid/partial/paid, zero total never paid), `clampPaid` [0,total] prevents silent overpayment, `calculateReturnable` = entered - total when overpaid, due = total - clampedPaid, returnable UI (`returnable` + `change_due` keys, ৳ + Bangla numerals in bn), optional `PaymentMethod`, UI shows paid/partial/unpaid + due + returnable when >0, verified by `sale_service_test.dart` (clamp + returnable) + `sale_entry_screen_test.dart` (partial, paid, overpayment clamped + returnable UI), CI `33006998608` (92/92), **device-validated at `ddce6f7`: partial (300000/250000) + paid (250000/250000, 50000/50000) + due derivable + payment_method cash in `184910.json` + `184952.json`; overpayment returnable NOT yet device-validated (CI-verified only)**
-- [ ] Private actual cost and profit
-- [ ] Customer/service recipient
-- [ ] Purchase/expense
+- [ ] Private actual cost and profit — optional cost can be entered on a product, but sale entry uses `costMinor: null` and does not link that product; the required posted cost basis and profit path is incomplete.
+- [ ] Customer/service recipient — customer records and detail screen exist, but sale entry does not attach a customer and the service-recipient flow is absent.
+- [ ] Purchase/expense — entry screens are reachable, but the complete save-and-summary path lacks widget/device evidence.
 - [ ] Return/refund/adjustment
 
 ## Gate 4 — Documents
 
-- [ ] Receipt generation
+- [ ] Receipt generation — a text share sheet exists, but `TransactionDetailsPage` passes it an empty `TransactionRecord`; the preview is not a valid receipt for the selected sale.
 - [ ] Multi-page pagination
 - [ ] PDF/share/print
 - [ ] Customer-facing privacy checks
@@ -61,13 +63,13 @@ A feature is not release-ready because its documentation exists. It must pass th
 
 - [x] Bengali UI script-purity audit — `AppText` bn values contain no Latin letters except placeholders like `{count}` (verified by `app_text_test.dart` script purity test with placeholder stripping), CI `33006998608` (92/92)
 - [x] English UI script-purity audit — `AppText` en values contain no Bengali script (verified by `app_text_test.dart`), CI `33006998608`
-- [x] No missing strings — bn keys 66, en keys 66, all present in both locales (verified by `app_text_test.dart` all keys present + new keys returnable/change_due/language), CI `33006998608`
-- [x] Loading/empty/error/offline states — workspace home smart empty state (`no_transactions` + hint), loading spinner, sale entry error snackbar `sale_failed`, settings busy indicator, verified by widget tests, CI `33006998608`
+- [ ] Complete localization — `app_text_test.dart` checks key parity inside `AppText`, but it does not cover all literal UI text; `ProductListScreen` and `ShareReceiptSheet` contain Portuguese labels outside `AppText`.
+- [ ] Loading/empty/error/offline states — some loading, empty and error states are present; no complete offline-state or recovery-path validation is recorded.
 - [ ] Accessibility checks
 - [ ] Motion/reduced-motion behavior
 - [ ] Touch target and keyboard checks
 - [x] Bangla numerals — `toBanglaDigits` converts Latin 0-9 to Bangla ০-৯, `money()` uses Bangla numerals in bn mode (`৳৮৫০`, `৳০`, `৳১৪০০`) and Latin + BDT in en mode (`BDT 850`), verified by `app_text_test.dart` money formatting + `sale_entry_screen_test.dart` Bangla numerals test, CI `33006998608` — **not yet device-validated for numerals (CI-verified only)**
-- [x] Language toggle — Settings language section with `RadioGroup` + `RadioListTile` bn/en (script-pure), `onLocaleChanged` callback in `main.dart` `_locale` state + `WelcomePage` + `WorkspaceHomePage` + `SettingsScreen`, default bn, verified by `settings_screen_test.dart` (settings reachable) — **not yet device-validated for toggle**
+- [ ] Language toggle — Settings offers Bangla and English and persists a selection, but current `main.dart` changes `_locale` without rebuilding the app root; the existing main-branch test checks option visibility only. Immediate workspace-language change and physical-device behavior remain unverified.
 
 ## Gate 8 — Validation
 
@@ -75,7 +77,7 @@ A feature is not release-ready because its documentation exists. It must pass th
 - [x] Domain tests — `sale_test.dart`, `diagnostic_*_test.dart`, `export_filename_test.dart`, `takaToMinor`/`minorToTaka`/`derivePaymentStatus`/`clampPaid`/`calculateReturnable`/`toBanglaDigits` tests, `app_text_test.dart` money formatting + script purity, CI `33006998608`
 - [x] Persistence tests — `sqlite_store_test.dart` via sqflite_common_ffi + `sale_service_test.dart` persistence incl overpayment clamp + failure recording + returnable, CI `33006998608`
 - [ ] Integration tests — onboarding widget tests + sale entry widget flows + workspace home widget tests + settings tests exist (onboarding → workspace routing, fast sale entry, workspace home recent list), but full integration smoke (offline recovery, inventory, large history) not yet
-- [x] Real-device tests — historical device validation COMPLETE for export/diagnostic milestone at `8e21317`/`8206b8d` (artifacts 104327 + 120529, Redmi Turbo 4 Pro); fast sale entry + workspace home + payment/due + restart persistence + export at `ddce6f7` **device-validated via Record 3 artifacts `184910.json` (Green It, 4 sales: Ssd 250000 paid, hdd qty2 300000 partial, #s 50000 paid, multi-line 1235800 partial) + `184952.json` (23 events, 2 app_start, Redmi 25053RT47C SDK36 bn debug) — 17/22 PASS, overpayment returnable + en BDT pending** — see `PHYSICAL_DEVICE_VALIDATION.md` Record 3; new fixes (returnable UI, Bangla numerals, locale toggle, sale-entry reactivity) **CI GREEN 92/92 at `9e25997` via `33006998608` but NOT yet device-validated**
+- [ ] Current release-flow device validation — export/diagnostic and manual fast-sale subsets have historical Redmi Turbo 4 Pro evidence (`PHYSICAL_DEVICE_VALIDATION.md`, including Record 3 at `ddce6f7`). That evidence does not qualify the current head's newer screens or the 14 complete P0 flows. Record 3 passed 17 of 22 checks; returnable and English display were pending.
 - [ ] Regression test
 - [ ] Release build reproducibility — only debug APK built (`app-debug.apk` 163 MB at `3ebac8b`), no release signing
 

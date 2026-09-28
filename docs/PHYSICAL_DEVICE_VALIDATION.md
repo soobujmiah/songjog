@@ -6,6 +6,8 @@
 
 # Physical Device Validation — Milestone & Checklist
 
+**Evidence boundary:** This is a dated validation record for the export/diagnostic milestone and later recorded subsets. A `COMPLETE` label below applies only to the named milestone and APK/commit in that record. It does not qualify the current Owner Edition release or the 14 flows in `MVP_ACCEPTANCE.md`; use that file's current delivery table for release status.
+
 **Milestone:** Physical Device Validation Ready
 **Branch:** `feature/android-owner-mvp`
 **Date:** 2026-08-26 (Asia/Dhaka)
@@ -410,4 +412,3 @@ non-blocking follow-up and was **not** marked PASS.
 - **Overall Device for fast sale increment:** **GREEN** for implemented features, **YELLOW** for 2 not tested items (overpayment, en BDT) — not RED
 
 **Boundary:** This record uses new artifacts `184910.json` + `184952.json` generated on physical Redmi Turbo 4 Pro at 18:49 UTC for HEAD `1f03fac`/`3ebac8b`. It does NOT reuse historical artifacts `104327`/`120529` as proof for new features. It does not claim English mode or overpayment clamp device validation. It does not claim release signing or commercial backend.
-
