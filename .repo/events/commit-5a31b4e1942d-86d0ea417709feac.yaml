@@ -1,0 +1,8 @@
+event_id: commit-5a31b4e1942d-86d0ea417709feac
+repository: soobujmiah/songjog
+commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
+kind: commit
+occurred_at: '2026-09-29T22:37:35Z'
+status: completed
+summary: Declare the repository's canonical type and add the documentation scaffold
+  (migration waves 2/3)

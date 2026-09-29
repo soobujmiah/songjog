@@ -1,13 +1,13 @@
 schema_version: 1
 project_id: songjog
 repository: soobujmiah/songjog
-generated_at: '2026-09-29T17:21:47Z'
+generated_at: '2026-09-29T22:45:49Z'
 generated_by: tools/repo_knowledge collect
-version: 6a821f0
+version: 5a31b4e
 head:
-  commit: 6a821f09619133566f0ff7db1852dd293cd9c167
+  commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
   branch: main
-  committed_at: '2026-09-29T17:17:25Z'
+  committed_at: '2026-09-29T22:37:35Z'
 phases:
   source: not_configured
   completed: []
@@ -15,33 +15,33 @@ phases:
   next: null
 build:
   status: passed
-  run_id: '36603887142'
-  commit: 6a821f09619133566f0ff7db1852dd293cd9c167
+  run_id: '36640679289'
+  commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
   run_attempt: '1'
-  at: '2026-09-29T17:21:47Z'
+  at: '2026-09-29T22:45:49Z'
   timestamp_source: observed
   workflow_name: Repo Knowledge Sync
   event_type: push
   actor: soobujmiah
-  run_url: https://github.com/soobujmiah/songjog/actions/runs/36603887142
+  run_url: https://github.com/soobujmiah/songjog/actions/runs/36640679289
 test:
   status: passed
-  run_id: '36603887142'
-  commit: 6a821f09619133566f0ff7db1852dd293cd9c167
+  run_id: '36640679289'
+  commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
   run_attempt: '1'
-  at: '2026-09-29T17:21:47Z'
+  at: '2026-09-29T22:45:49Z'
   timestamp_source: observed
   workflow_name: Repo Knowledge Sync
   event_type: push
   actor: soobujmiah
-  run_url: https://github.com/soobujmiah/songjog/actions/runs/36603887142
+  run_url: https://github.com/soobujmiah/songjog/actions/runs/36640679289
   summary: flutter test (apps/android)
 last_successful_build:
-  commit: 6a821f09619133566f0ff7db1852dd293cd9c167
-  at: '2026-09-29T17:21:47Z'
-  run_id: '36603887142'
+  commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
+  at: '2026-09-29T22:45:49Z'
+  run_id: '36640679289'
 last_failed_build: null
 sync:
   status: ok
-  last_synced_at: '2026-09-29T17:21:47Z'
+  last_synced_at: '2026-09-29T22:45:49Z'
   source: ci

@@ -1,0 +1,13 @@
+event_id: test-5a31b4e1942d-36640679289-1
+repository: soobujmiah/songjog
+commit: 5a31b4e1942dc67227292b6e6037814a5e1ce64a
+kind: test
+occurred_at: '2026-09-29T22:45:49Z'
+run_id: '36640679289'
+run_attempt: '1'
+status: passed
+summary: flutter test (apps/android)
+workflow_name: Repo Knowledge Sync
+event_type: push
+actor: soobujmiah
+run_url: https://github.com/soobujmiah/songjog/actions/runs/36640679289
