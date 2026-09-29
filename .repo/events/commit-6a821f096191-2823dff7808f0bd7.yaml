@@ -1,0 +1,8 @@
+event_id: commit-6a821f096191-2823dff7808f0bd7
+repository: soobujmiah/songjog
+commit: 6a821f09619133566f0ff7db1852dd293cd9c167
+kind: commit
+occurred_at: '2026-09-29T17:17:25Z'
+status: completed
+summary: 'feat(repo-knowledge): upgrade vendored tooling, schemas, and final-run sync
+  contract'
